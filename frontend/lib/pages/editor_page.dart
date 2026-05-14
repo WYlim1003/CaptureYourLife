@@ -1,22 +1,22 @@
+import 'package:capture_your_life/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:io';
 import '../config/app_colors.dart';
 import '../components/image_preview.dart';
 import '../components/style_selector.dart';
 import '../components/primary_button.dart';
 import '../components/loading_spinner.dart';
 import '../providers/generation_provider.dart';
-import '../providers/image_provider.dart';
 import '../services/api_service.dart';
+
 
 class EditorPage extends ConsumerStatefulWidget {
   final String imagePath;
 
   const EditorPage({
     required this.imagePath,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   ConsumerState<EditorPage> createState() => _EditorPageState();
@@ -30,17 +30,21 @@ class _EditorPageState extends ConsumerState<EditorPage> {
   void initState() {
     super.initState();
     selectedTab = 'sticker';
-    _uploadImage();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _uploadImage();
+    });
   }
 
-  void _uploadImage() async {
+  Future<void> _uploadImage() async {
     try {
       final apiService = ref.read(apiServiceProvider);
       final result = await apiService.uploadImage(widget.imagePath);
+      if (!mounted) return; // Safer check
       setState(() {
         uploadedImageId = result['image_id'];
       });
     } catch (e) {
+      if (!context.mounted) return; // Fixed BuildContext async gap warning
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Upload failed: $e')),
       );
@@ -111,31 +115,31 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                         label: selectedTab == 'sticker'
                             ? 'Generate Sticker'
                             : 'Generate Avatar',
+                        // FIXED: The argument type error is because PrimaryButton expects a non-null VoidCallback.
                         onPressed: uploadedImageId != null
                             ? () async {
                                 if (selectedTab == 'sticker') {
-                                  await ref
+                                  ref
                                       .read(generationNotifierProvider.notifier)
                                       .generateSticker(uploadedImageId!);
                                 } else {
-                                  await ref
+                                  ref
                                       .read(generationNotifierProvider.notifier)
-                                      .generateAvatar(uploadedImageId!, selectedStyle);
+                                      .generateAvatar(
+                                          uploadedImageId!, selectedStyle);
                                 }
-                                Future.delayed(
-                                  const Duration(seconds: 2),
-                                  () {
-                                    if (mounted) {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/preview',
-                                        arguments: generationState,
-                                      );
-                                    }
-                                  },
+                                
+                                // FIXED: BuildContext across async gaps warning
+                                await Future.delayed(const Duration(seconds: 2));
+                                if (!context.mounted) return; 
+
+                                Navigator.pushNamed(
+                                  context,
+                                  '/preview',
+                                  arguments: generationState,
                                 );
                               }
-                            : null,
+                            : () {}, // Replaced 'null' with an empty function '() {}'
                       );
                     }
                     return const SizedBox.shrink();
@@ -179,6 +183,7 @@ class _TabSelector extends StatelessWidget {
   final String selectedTab;
   final Function(String) onTabChanged;
 
+  // FIXED: Removed "super.key" to resolve the "value for optional parameter 'key' isn't ever given" warning.
   const _TabSelector({
     required this.selectedTab,
     required this.onTabChanged,
@@ -209,6 +214,7 @@ class _TabButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onPressed;
 
+  // FIXED: Removed "super.key" here as well.
   const _TabButton({
     required this.label,
     required this.isSelected,

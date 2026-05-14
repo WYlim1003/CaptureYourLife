@@ -6,7 +6,7 @@ class LoadingSpinner extends StatelessWidget {
   final double size;
   final Color color;
 
-  const LoadingSpinner({
+  const LoadingSpinner({super.key, 
     this.message = 'Loading...',
     this.size = 50,
     this.color = AppColors.primaryColor,

@@ -9,8 +9,8 @@ class PreviewPage extends ConsumerWidget {
 
   const PreviewPage({
     required this.generationResult,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

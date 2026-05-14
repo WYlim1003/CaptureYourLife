@@ -6,7 +6,7 @@ class ImagePickerWidget extends StatelessWidget {
   final VoidCallback onGalleryPressed;
   final bool isLoading;
 
-  const ImagePickerWidget({
+  const ImagePickerWidget({super.key, 
     required this.onCameraPressed,
     required this.onGalleryPressed,
     this.isLoading = false,

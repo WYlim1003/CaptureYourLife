@@ -8,7 +8,7 @@ class ImagePreview extends StatelessWidget {
   final String title;
   final VoidCallback? onRetry;
 
-  const ImagePreview({
+  const ImagePreview({super.key, 
     this.imagePath,
     this.imageUrl,
     this.title = '',

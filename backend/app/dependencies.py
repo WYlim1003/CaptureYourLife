@@ -4,7 +4,7 @@ from firebase_admin import firestore
 from firebase_admin import auth as firebase_auth
 from app.config import settings
 from fastapi import HTTPException, Depends
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from typing import Optional
 import json
@@ -43,7 +43,7 @@ def get_db():
     return db
 
 
-async def verify_token(credentials: HTTPAuthCredentials = Depends(security)) -> dict:
+async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     token = credentials.credentials
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])

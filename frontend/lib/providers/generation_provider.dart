@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/api_service.dart';
+import './auth_provider.dart';
 
 final generationNotifierProvider =
     StateNotifierProvider<GenerationNotifier, AsyncValue<Map<String, dynamic>>>((ref) {
@@ -18,8 +19,6 @@ final generationHistoryProvider =
 });
 
 final selectedStyleProvider = StateProvider<String>((ref) => 'anime');
-
-import 'auth_provider.dart';
 
 class GenerationNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>> {
   final ApiService _apiService;

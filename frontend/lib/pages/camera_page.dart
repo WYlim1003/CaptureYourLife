@@ -7,7 +7,7 @@ import '../components/primary_button.dart';
 import '../providers/image_provider.dart';
 
 class CameraPage extends ConsumerWidget {
-  const CameraPage({Key? key}) : super(key: key);
+  const CameraPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

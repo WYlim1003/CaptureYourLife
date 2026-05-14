@@ -6,7 +6,7 @@ class StyleSelector extends StatelessWidget {
   final String selectedStyle;
   final Function(String) onStyleSelected;
 
-  const StyleSelector({
+  const StyleSelector({super.key, 
     required this.styles,
     required this.selectedStyle,
     required this.onStyleSelected,

@@ -5,7 +5,7 @@ import '../components/loading_spinner.dart';
 import '../providers/generation_provider.dart';
 
 class GalleryPage extends ConsumerWidget {
-  const GalleryPage({Key? key}) : super(key: key);
+  const GalleryPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,17 +35,17 @@ class GalleryPage extends ConsumerWidget {
             final generations = data['generations'] as List? ?? [];
 
             if (generations.isEmpty) {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.image_not_supported_outlined,
                       size: 64,
                       color: AppColors.textTertiary,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    SizedBox(height: 16),
+                    Text(
                       'No generations yet',
                       style: TextStyle(
                         fontSize: 18,
@@ -53,8 +53,8 @@ class GalleryPage extends ConsumerWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                       'Create your first AI generation!',
                       style: TextStyle(
                         fontSize: 14,
