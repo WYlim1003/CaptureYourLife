@@ -12,7 +12,20 @@
           "package_name": "com.wanyee.captureyourlife"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "786561093977-dh1uhg1goeghvi00ue5j78o07o1ebvna.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wanyee.captureyourlife",
+            "certificate_hash": "0ea68569b05c1ddb95b0202e757f5d24d8172cc7"
+          }
+        },
+        {
+          "client_id": "786561093977-h96fk9t2po8jco3k15j3shmvn3ulsglc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBKFsSnhw3l3mlkGbCMgltLAs0vz1MnipM"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "786561093977-h96fk9t2po8jco3k15j3shmvn3ulsglc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
