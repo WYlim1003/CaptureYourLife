@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import '../config/app_colors.dart';
+import '../utils/image_from_path.dart';
 
 class ImagePreview extends StatelessWidget {
   final String? imagePath;
@@ -23,7 +23,7 @@ class ImagePreview extends StatelessWidget {
         if (title.isNotEmpty)
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
@@ -37,8 +37,8 @@ class ImagePreview extends StatelessWidget {
             height: 300,
             color: AppColors.backgroundColor,
             child: imagePath != null
-                ? Image.file(
-                    File(imagePath!),
+                ? ImageFromPath(
+                    path: imagePath!,
                     fit: BoxFit.cover,
                   )
                 : imageUrl != null
@@ -55,7 +55,7 @@ class ImagePreview extends StatelessWidget {
                           );
                         },
                       )
-                    : const Center(
+                    : Center(
                         child: Icon(
                           Icons.image_not_supported_outlined,
                           size: 48,
@@ -80,13 +80,13 @@ class _ErrorWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.error_outline,
             size: 48,
             color: AppColors.errorColor,
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Failed to load image',
             style: TextStyle(color: AppColors.errorColor),
           ),

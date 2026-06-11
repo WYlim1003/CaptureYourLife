@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/app_colors.dart';
 import '../providers/image_provider.dart';
 import '../providers/photo_provider.dart';
+import '../utils/image_from_path.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -72,7 +72,7 @@ class _CameraPageState extends ConsumerState<CameraPage>
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new,
+          icon: Icon(Icons.arrow_back_ios_new,
               color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
@@ -104,7 +104,7 @@ class _CameraPageState extends ConsumerState<CameraPage>
             }
 
             return _ImagePreviewPanel(
-              imageFile: File(image.path),
+              imagePath: image.path,
               isUploading: _isUploading,
               onRetake: () =>
                   ref.read(imagePickerNotifierProvider.notifier).reset(),
@@ -115,7 +115,7 @@ class _CameraPageState extends ConsumerState<CameraPage>
               },
             );
           },
-          loading: () => const Center(
+          loading: () => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -134,12 +134,12 @@ class _CameraPageState extends ConsumerState<CameraPage>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline,
+                  Icon(Icons.error_outline,
                       color: AppColors.errorColor, size: 48),
                   const SizedBox(height: 12),
                   Text(
                     error.toString(),
-                    style: const TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: AppColors.textSecondary),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -300,14 +300,14 @@ class _SourceButton extends StatelessWidget {
 // ─── Image preview + action panel ───────────────────────────────────────────
 
 class _ImagePreviewPanel extends StatelessWidget {
-  final File imageFile;
+  final String imagePath;
   final bool isUploading;
   final VoidCallback onRetake;
   final VoidCallback onUpload;
   final VoidCallback onEditWithAI;
 
   const _ImagePreviewPanel({
-    required this.imageFile,
+    required this.imagePath,
     required this.isUploading,
     required this.onRetake,
     required this.onUpload,
@@ -323,8 +323,8 @@ class _ImagePreviewPanel extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.file(
-                imageFile,
+              child: ImageFromPath(
+                path: imagePath,
                 fit: BoxFit.cover,
                 width: double.infinity,
               ),
@@ -336,7 +336,7 @@ class _ImagePreviewPanel extends StatelessWidget {
           child: Column(
             children: [
               if (isUploading) ...[
-                const LinearProgressIndicator(
+                LinearProgressIndicator(
                   backgroundColor: AppColors.surfaceColor,
                   color: AppColors.primaryColor,
                 ),
@@ -357,7 +357,7 @@ class _ImagePreviewPanel extends StatelessWidget {
                               fontWeight: FontWeight.w600)),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textSecondary,
-                        side: const BorderSide(color: AppColors.borderColor),
+                        side: BorderSide(color: AppColors.borderColor),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -405,12 +405,12 @@ class _ImagePreviewPanel extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: isUploading ? null : onEditWithAI,
                   icon: const Icon(Icons.auto_awesome, size: 18),
-                  label: Text('AI Studio (Coming Soon)',
+                  label: Text('AI Studio',
                       style: GoogleFonts.outfit(
                           fontWeight: FontWeight.w500)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primaryLight,
-                    side: const BorderSide(
+                    side: BorderSide(
                         color: AppColors.primaryColor, width: 1.5),
                     padding:
                         const EdgeInsets.symmetric(vertical: 14),

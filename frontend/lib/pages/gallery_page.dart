@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/image_from_path.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +19,7 @@ class GalleryPage extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new,
+          icon: Icon(Icons.arrow_back_ios_new,
               color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
@@ -33,7 +34,7 @@ class GalleryPage extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout_outlined,
+            icon: Icon(Icons.logout_outlined,
                 color: AppColors.textSecondary, size: 20),
             onPressed: () async {
               await ref.read(authNotifierV2Provider.notifier).logout();
@@ -75,12 +76,12 @@ class GalleryPage extends ConsumerWidget {
               },
             );
           },
-          loading: () => const Center(
+          loading: () => Center(
             child: CircularProgressIndicator(color: AppColors.primaryColor),
           ),
           error: (e, _) => Center(
             child: Text('Error: $e',
-                style: const TextStyle(color: AppColors.textSecondary)),
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
         ),
       ),
@@ -158,12 +159,12 @@ class _GalleryItem extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.file(
-              File(photo['local_path'] ?? ''),
+            ImageFromPath(
+              path: photo['local_path'] ?? '',
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Container(
                 color: AppColors.cardColor,
-                child: const Icon(Icons.broken_image_outlined,
+                child: Icon(Icons.broken_image_outlined,
                     color: AppColors.textTertiary, size: 24),
               ),
             ),
@@ -176,7 +177,7 @@ class _GalleryItem extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                       vertical: 4, horizontal: 6),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: AppColors.darkOverlay,
                   ),
                   child: Text(
@@ -216,7 +217,7 @@ class _EmptyGallery extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.borderColor),
               ),
-              child: const Icon(Icons.photo_library_outlined,
+              child: Icon(Icons.photo_library_outlined,
                   color: AppColors.textTertiary, size: 44),
             ),
             const SizedBox(height: 24),

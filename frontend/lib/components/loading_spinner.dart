@@ -13,7 +13,7 @@ class LoadingSpinner extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(
+          CircularProgressIndicator(
             color: AppColors.primaryColor,
             strokeWidth: 3,
           ),

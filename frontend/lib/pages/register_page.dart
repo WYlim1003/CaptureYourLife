@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/app_colors.dart';
 import '../providers/firebase_auth_provider.dart';
+import '../utils/auth_navigation.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -53,6 +54,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
         );
   }
 
+  Future<void> _googleSignIn() async {
+    await ref.read(authNotifierV2Provider.notifier).signInWithGoogle();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierV2Provider);
@@ -60,7 +65,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
 
     ref.listen(authNotifierV2Provider, (_, next) {
       if (next is AsyncData && next.value != null) {
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+        navigateAfterAuth(context, ref);
       }
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -77,7 +82,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -114,8 +119,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
                       // Display name
                       TextFormField(
                         controller: _nameController,
-                        style: const TextStyle(color: AppColors.textPrimary),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: AppColors.textPrimary),
+                        decoration: InputDecoration(
                           labelText: 'Display Name',
                           prefixIcon: Icon(Icons.person_outline,
                               color: AppColors.textSecondary),
@@ -130,15 +135,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(color: AppColors.textPrimary),
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
+                        style: TextStyle(color: AppColors.textPrimary),
+                        decoration: InputDecoration(
+                          labelText: 'Gmail Address',
                           prefixIcon: Icon(Icons.email_outlined,
                               color: AppColors.textSecondary),
                         ),
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Enter your email';
-                          if (!v.contains('@')) return 'Enter a valid email';
+                          if (v == null || v.isEmpty) return 'Enter your Gmail';
+                          if (!AuthNotifierV2.isGmailAddress(v)) {
+                            return 'Use a Gmail address (@gmail.com)';
+                          }
                           return null;
                         },
                       ),
@@ -147,10 +154,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
-                        style: const TextStyle(color: AppColors.textPrimary),
+                        style: TextStyle(color: AppColors.textPrimary),
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock_outline,
+                          prefixIcon: Icon(Icons.lock_outline,
                               color: AppColors.textSecondary),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -174,10 +181,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
                       TextFormField(
                         controller: _confirmController,
                         obscureText: _obscureConfirm,
-                        style: const TextStyle(color: AppColors.textPrimary),
+                        style: TextStyle(color: AppColors.textPrimary),
                         decoration: InputDecoration(
                           labelText: 'Confirm Password',
-                          prefixIcon: const Icon(Icons.lock_outline,
+                          prefixIcon: Icon(Icons.lock_outline,
                               color: AppColors.textSecondary),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -244,6 +251,26 @@ class _RegisterPageState extends ConsumerState<RegisterPage>
                         ),
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: isLoading ? null : _googleSignIn,
+                    icon: const Icon(Icons.g_mobiledata, size: 28),
+                    label: Text(
+                      'Sign up with Google',
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: BorderSide(color: AppColors.borderColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

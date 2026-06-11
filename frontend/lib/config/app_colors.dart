@@ -1,48 +1,40 @@
 import 'package:flutter/material.dart';
+import 'theme_config.dart';
 
+/// Dynamic color palette — updated when the user changes theme.
 class AppColors {
-  // Primary brand colors
-  static const Color primaryColor = Color(0xFF6C63FF);
-  static const Color primaryLight = Color(0xFF9D97FF);
-  static const Color primaryDark = Color(0xFF4A43CC);
+  static ThemeConfig _config = ThemeConfig.dark();
 
-  static const Color secondaryColor = Color(0xFFFF6584);
-  static const Color accentColor = Color(0xFF43E97B);
+  static void apply(ThemeConfig config) => _config = config;
 
-  // Dark theme backgrounds
-  static const Color backgroundColor = Color(0xFF0F0F1A);
-  static const Color surfaceColor = Color(0xFF1A1A2E);
-  static const Color cardColor = Color(0xFF16213E);
-  static const Color overlayColor = Color(0xFF0D1117);
+  static Color get primaryColor => _config.primaryColor;
+  static Color get primaryLight =>
+      Color.lerp(primaryColor, Colors.white, 0.3) ?? primaryColor;
+  static Color get primaryDark =>
+      Color.lerp(primaryColor, Colors.black, 0.25) ?? primaryColor;
 
-  // Error
-  static const Color errorColor = Color(0xFFFF4757);
+  static Color get secondaryColor => _config.secondaryColor;
+  static Color get accentColor => _config.accentColor;
 
-  // Text
-  static const Color textPrimary = Color(0xFFF0F0F5);
-  static const Color textSecondary = Color(0xFFAAAAAF);
-  static const Color textTertiary = Color(0xFF666680);
+  static Color get backgroundColor => _config.backgroundColor;
+  static Color get surfaceColor => _config.surfaceColor;
+  static Color get cardColor => _config.cardColor;
+  static Color get overlayColor => _config.backgroundColor;
 
-  // Borders & dividers
-  static const Color borderColor = Color(0xFF2A2A4A);
-  static const Color dividerColor = Color(0xFF1E1E35);
+  static Color get errorColor => _config.errorColor;
 
-  // Gradients
-  static const LinearGradient primaryGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF6C63FF), Color(0xFF9D50BB)],
-  );
+  static Color get textPrimary => _config.textPrimary;
+  static Color get textSecondary => _config.textSecondary;
+  static Color get textTertiary => _config.textTertiary;
 
-  static const LinearGradient cardGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
-  );
+  static Color get borderColor => _config.borderColor;
+  static Color get dividerColor => _config.dividerColor;
 
-  static const LinearGradient darkOverlay = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Colors.transparent, Color(0xCC000000)],
-  );
+  static LinearGradient get primaryGradient => _config.primaryGradient;
+  static LinearGradient get cardGradient => LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [surfaceColor, cardColor],
+      );
+  static LinearGradient get darkOverlay => _config.darkOverlay;
 }

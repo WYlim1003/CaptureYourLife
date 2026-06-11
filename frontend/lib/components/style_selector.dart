@@ -17,7 +17,7 @@ class StyleSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Select Style',
           style: TextStyle(
             fontSize: 16,

@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>CaptureYourLife needs camera access to take photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CaptureYourLife needs photo library access to import images.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>CaptureYourLife needs permission to save photos to your library.</string>
 </dict>
 </plist>

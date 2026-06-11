@@ -17,7 +17,7 @@ class ImagePickerWidget extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Choose Image Source',
           style: TextStyle(
             fontSize: 20,
@@ -83,7 +83,7 @@ class _PickerOption extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,

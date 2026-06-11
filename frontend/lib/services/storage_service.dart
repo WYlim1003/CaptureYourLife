@@ -1,8 +1,9 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
+import '../utils/image_from_path.dart';
 
 class StorageService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,23 +17,26 @@ class StorageService {
     final uid = _uid;
     if (uid == null) throw Exception('User not logged in');
 
-    final sourceFile = File(filePath);
     final photoId = _uuid.v4();
 
     // Get file extension
     final parts = filePath.split('.');
-    final ext = parts.length > 1 ? '.${parts.last}' : '.jpg';
-    final fileName = filePath.split('/').last;
-    
-    // Save locally to app documents directory
-    final appDir = await getApplicationDocumentsDirectory();
-    final userDir = Directory('${appDir.path}/users/$uid/photos');
-    if (!await userDir.exists()) {
-      await userDir.create(recursive: true);
+    final ext = parts.length > 1 ? '.${parts.last.split('?').first}' : '.jpg';
+    final fileName = filePath.split('/').last.split('?').first;
+
+    final String localPath;
+    if (kIsWeb) {
+      // Web image_picker returns a blob URL — store it directly.
+      localPath = filePath;
+    } else {
+      final appDir = await getApplicationDocumentsDirectory();
+      final userDirPath = '${appDir.path}/users/$uid/photos';
+      localPath = '$userDirPath/$photoId$ext';
+      await copyPhotoToStorage(
+        sourcePath: filePath,
+        destinationPath: localPath,
+      );
     }
-    
-    final localPath = '${userDir.path}/$photoId$ext';
-    await sourceFile.copy(localPath);
 
     // Save metadata to Firestore
     final now = DateTime.now();
@@ -85,10 +89,7 @@ class StorageService {
     if (uid == null) throw Exception('User not logged in');
 
     try {
-      final file = File(localPath);
-      if (await file.exists()) {
-        await file.delete();
-      }
+      await deleteLocalPhoto(localPath);
     } catch (_) {
       // Ignore if file already deleted
     }

@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     firebase_client_email: Optional[str] = None
 
     replicate_api_token: Optional[str] = None
+    gemini_api_key: Optional[str] = None
 
     server_host: str = "0.0.0.0"
     server_port: int = 8000

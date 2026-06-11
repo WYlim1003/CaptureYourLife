@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import '../config/app_colors.dart';
 import '../providers/photo_provider.dart';
+import '../utils/image_from_path.dart';
 
 class PhotoDetailPage extends ConsumerStatefulWidget {
   final Map<String, dynamic> photo;
@@ -74,8 +75,8 @@ class _PhotoDetailPageState extends ConsumerState<PhotoDetailPage> {
           minScale: 0.5,
           maxScale: 4.0,
           child: Center(
-            child: Image.file(
-              File(photo['local_path'] ?? ''),
+            child: ImageFromPath(
+              path: photo['local_path'] ?? '',
               fit: BoxFit.contain,
               width: double.infinity,
               height: double.infinity,
@@ -116,15 +117,14 @@ class _PhotoDetailPageState extends ConsumerState<PhotoDetailPage> {
                       icon: Icons.auto_awesome,
                       label: 'AI Edit',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'AI features coming soon! 🚀',
-                              style: GoogleFonts.outfit(),
-                            ),
-                            backgroundColor: AppColors.primaryColor,
-                          ),
-                        );
+                        final path = photo['local_path'] as String?;
+                        if (path != null && path.isNotEmpty) {
+                          Navigator.pushNamed(
+                            context,
+                            '/editor',
+                            arguments: path,
+                          );
+                        }
                       },
                     ),
                   ),
@@ -137,11 +137,22 @@ class _PhotoDetailPageState extends ConsumerState<PhotoDetailPage> {
 
   Future<void> _saveToGallery(String? localPath) async {
     if (localPath == null || localPath.isEmpty) return;
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Save to gallery is available on mobile only.',
+              style: GoogleFonts.outfit()),
+          backgroundColor: AppColors.primaryColor,
+        ),
+      );
+      return;
+    }
     setState(() => _isSaving = true);
     try {
-      final file = File(localPath);
-      if (!await file.exists()) throw Exception('File not found');
-      await Gal.putImage(file.path);
+      if (!await localPhotoExists(localPath)) {
+        throw Exception('File not found');
+      }
+      await Gal.putImage(localPath);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -169,10 +180,12 @@ class _PhotoDetailPageState extends ConsumerState<PhotoDetailPage> {
     if (localPath == null || localPath.isEmpty) return;
     setState(() => _isSharing = true);
     try {
-      final file = File(localPath);
-      if (!await file.exists()) throw Exception('File not found');
+      if (!await localPhotoExists(localPath)) {
+        throw Exception('File not found');
+      }
+      final file = await toShareableFile(localPath);
       await Share.shareXFiles(
-        [XFile(file.path)],
+        [file],
         text: 'Check out my photo from CaptureYourLife! 📸',
       );
     } catch (e) {

@@ -5,16 +5,17 @@ class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
   final bool isLoading;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Color textColor;
   final double width;
   final double height;
 
-  const PrimaryButton({super.key, 
+  PrimaryButton({
+    super.key,
     required this.label,
     required this.onPressed,
     this.isLoading = false,
-    this.backgroundColor = AppColors.primaryColor,
+    this.backgroundColor,
     this.textColor = Colors.white,
     this.width = double.infinity,
     this.height = 48,
@@ -28,8 +29,9 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          disabledBackgroundColor: backgroundColor.withOpacity(0.6),
+          backgroundColor: backgroundColor ?? AppColors.primaryColor,
+          disabledBackgroundColor:
+              (backgroundColor ?? AppColors.primaryColor).withOpacity(0.6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

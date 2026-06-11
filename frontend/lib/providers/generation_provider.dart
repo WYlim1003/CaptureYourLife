@@ -1,41 +1,33 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/api_service.dart';
-import './auth_provider.dart';
+import '../services/gemini_service.dart';
+
+final geminiServiceProvider = Provider((ref) => GeminiService());
 
 final generationNotifierProvider =
-    StateNotifierProvider<GenerationNotifier, AsyncValue<Map<String, dynamic>>>((ref) {
-  final apiService = ref.watch(apiServiceProvider);
-  return GenerationNotifier(apiService);
-});
-
-final generationHistoryProvider =
-    FutureProvider<Map<String, dynamic>>((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
-  try {
-    return await apiService.getGenerationHistory();
-  } catch (e) {
-    return {'generations': []};
-  }
+    StateNotifierProvider<GenerationNotifier, AsyncValue<Map<String, dynamic>>>(
+        (ref) {
+  final gemini = ref.watch(geminiServiceProvider);
+  return GenerationNotifier(gemini);
 });
 
 final selectedStyleProvider = StateProvider<String>((ref) => 'anime');
 
 class GenerationNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>> {
-  final ApiService _apiService;
+  final GeminiService _gemini;
 
-  GenerationNotifier(this._apiService) : super(const AsyncValue.data({}));
+  GenerationNotifier(this._gemini) : super(const AsyncValue.data({}));
 
-  Future<void> generateSticker(String imageId) async {
+  Future<void> generateSticker(String imagePath) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
-      () => _apiService.generateSticker(imageId),
+      () => _gemini.generateSticker(imagePath),
     );
   }
 
-  Future<void> generateAvatar(String imageId, String style) async {
+  Future<void> generateAvatar(String imagePath, String style) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
-      () => _apiService.generateAvatar(imageId, style),
+      () => _gemini.generateAvatar(imagePath, style),
     );
   }
 

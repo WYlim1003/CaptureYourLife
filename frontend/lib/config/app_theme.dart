@@ -1,43 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'app_colors.dart';
+import 'theme_config.dart';
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData fromConfig(ThemeConfig config) {
+    final isDark = config.backgroundColor.computeLuminance() < 0.5;
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: AppColors.primaryColor,
-      scaffoldBackgroundColor: AppColors.backgroundColor,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryColor,
-        secondary: AppColors.secondaryColor,
-        surface: AppColors.surfaceColor,
-        error: AppColors.errorColor,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onSurface: AppColors.textPrimary,
+      brightness: isDark ? Brightness.dark : Brightness.light,
+      primaryColor: config.primaryColor,
+      scaffoldBackgroundColor: config.backgroundColor,
+      colorScheme: ColorScheme(
+        brightness: isDark ? Brightness.dark : Brightness.light,
+        primary: config.primaryColor,
+        onPrimary: _onColor(config.primaryColor),
+        secondary: config.secondaryColor,
+        onSecondary: _onColor(config.secondaryColor),
+        surface: config.surfaceColor,
+        onSurface: config.textPrimary,
+        error: config.errorColor,
+        onError: Colors.white,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        systemOverlayStyle:
+            isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         titleTextStyle: GoogleFonts.outfit(
-          color: AppColors.textPrimary,
+          color: config.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: IconThemeData(color: config.textPrimary),
       ),
       textTheme: GoogleFonts.outfitTextTheme().apply(
-        bodyColor: AppColors.textPrimary,
-        displayColor: AppColors.textPrimary,
+        bodyColor: config.textPrimary,
+        displayColor: config.textPrimary,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryColor,
-          foregroundColor: Colors.white,
+          backgroundColor: config.primaryColor,
+          foregroundColor: _onColor(config.primaryColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -50,45 +54,53 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: config.surfaceColor,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderColor),
+          borderSide: BorderSide(color: config.borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderColor),
+          borderSide: BorderSide(color: config.borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
+          borderSide: BorderSide(color: config.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.errorColor),
+          borderSide: BorderSide(color: config.errorColor),
         ),
-        labelStyle: const TextStyle(color: AppColors.textSecondary),
-        hintStyle: const TextStyle(color: AppColors.textTertiary),
+        labelStyle: TextStyle(color: config.textSecondary),
+        hintStyle: TextStyle(color: config.textTertiary),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.cardColor,
+        color: config.cardColor,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.borderColor),
+          side: BorderSide(color: config.borderColor),
         ),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.dividerColor,
+      dividerTheme: DividerThemeData(
+        color: config.dividerColor,
         thickness: 1,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.surfaceColor,
-        contentTextStyle: GoogleFonts.outfit(color: AppColors.textPrimary),
+        backgroundColor: config.surfaceColor,
+        contentTextStyle: GoogleFonts.outfit(color: config.textPrimary),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
+
+  static Color _onColor(Color background) {
+    return background.computeLuminance() > 0.5 ? Colors.black87 : Colors.white;
+  }
+
+  /// Legacy accessor — prefer [fromConfig].
+  static ThemeData get darkTheme => fromConfig(ThemeConfig.dark());
 }

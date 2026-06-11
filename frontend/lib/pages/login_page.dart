@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/app_colors.dart';
 import '../providers/firebase_auth_provider.dart';
+import '../utils/auth_navigation.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -47,6 +48,10 @@ class _LoginPageState extends ConsumerState<LoginPage>
         );
   }
 
+  Future<void> _googleSignIn() async {
+    await ref.read(authNotifierV2Provider.notifier).signInWithGoogle();
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierV2Provider);
@@ -54,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
 
     ref.listen(authNotifierV2Provider, (_, next) {
       if (next is AsyncData && next.value != null) {
-        Navigator.pushReplacementNamed(context, '/home');
+        navigateAfterAuth(context, ref);
       }
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -80,21 +85,27 @@ class _LoginPageState extends ConsumerState<LoginPage>
                 const SizedBox(height: 40),
                 // Logo
                 Center(
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryColor.withOpacity(0.4),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/images/Logo.png',
+                      width: 72,
+                      height: 72,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                      ],
+                        child: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 36,
+                        ),
+                      ),
                     ),
-                    child: const Icon(Icons.camera_alt, color: Colors.white, size: 36),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -127,8 +138,8 @@ class _LoginPageState extends ConsumerState<LoginPage>
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        style: const TextStyle(color: AppColors.textPrimary),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: AppColors.textPrimary),
+                        decoration: InputDecoration(
                           labelText: 'Email',
                           prefixIcon: Icon(Icons.email_outlined,
                               color: AppColors.textSecondary),
@@ -144,10 +155,10 @@ class _LoginPageState extends ConsumerState<LoginPage>
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
-                        style: const TextStyle(color: AppColors.textPrimary),
+                        style: TextStyle(color: AppColors.textPrimary),
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock_outline,
+                          prefixIcon: Icon(Icons.lock_outline,
                               color: AppColors.textSecondary),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -213,6 +224,40 @@ class _LoginPageState extends ConsumerState<LoginPage>
                         ),
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: AppColors.borderColor)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'or',
+                        style: GoogleFonts.outfit(color: AppColors.textSecondary),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: AppColors.borderColor)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: isLoading ? null : _googleSignIn,
+                    icon: const Icon(Icons.g_mobiledata, size: 28),
+                    label: Text(
+                      'Continue with Google',
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: BorderSide(color: AppColors.borderColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

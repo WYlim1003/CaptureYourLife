@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../config/app_colors.dart';
 import '../providers/photo_provider.dart';
 import '../providers/firebase_auth_provider.dart';
+import '../utils/image_from_path.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -56,6 +56,12 @@ class HomePage extends ConsumerWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _IconBtn(
+                        icon: Icons.palette_outlined,
+                        onTap: () =>
+                            Navigator.pushNamed(context, '/theme_picker'),
+                      ),
+                      const SizedBox(width: 8),
                       _IconBtn(
                         icon: Icons.photo_library_outlined,
                         onTap: () => Navigator.pushNamed(context, '/gallery'),
@@ -195,12 +201,12 @@ class HomePage extends ConsumerWidget {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(14),
-                            child: Image.file(
-                              File(photo['local_path'] ?? ''),
+                            child: ImageFromPath(
+                              path: photo['local_path'] ?? '',
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => Container(
                                 color: AppColors.cardColor,
-                                child: const Icon(Icons.broken_image_outlined,
+                                child: Icon(Icons.broken_image_outlined,
                                     color: AppColors.textTertiary),
                               ),
                             ),
@@ -211,8 +217,8 @@ class HomePage extends ConsumerWidget {
                   ),
                 );
               },
-              loading: () => const Padding(
-                padding: EdgeInsets.all(20),
+              loading: () => Padding(
+                padding: const EdgeInsets.all(20),
                 child: Center(
                   child: CircularProgressIndicator(color: AppColors.primaryColor),
                 ),
