@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/firebase_options.dart';
 import 'pages/home_page.dart';
+import 'pages/main_page.dart';
 import 'pages/camera_page.dart';
 import 'pages/gallery_page.dart';
 import 'pages/login_page.dart';
@@ -40,7 +41,7 @@ class MyApp extends ConsumerWidget {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/home':
-            return _fadeRoute(const HomePage());
+            return _fadeRoute(const MainPage());
           case '/camera':
             return _fadeRoute(const CameraPage());
           case '/gallery':

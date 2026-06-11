@@ -229,12 +229,6 @@ class HomePage extends ConsumerWidget {
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
-
-      // FAB camera button
-      floatingActionButton: _CameraFAB(
-        onTap: () => Navigator.pushNamed(context, '/camera'),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

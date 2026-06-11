@@ -7,7 +7,12 @@ import '../providers/photo_provider.dart';
 import '../utils/image_from_path.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
-  const CameraPage({super.key});
+  final bool showBackButton;
+  
+  const CameraPage({
+    super.key,
+    this.showBackButton = true,
+  });
 
   @override
   ConsumerState<CameraPage> createState() => _CameraPageState();
@@ -71,11 +76,14 @@ class _CameraPageState extends ConsumerState<CameraPage>
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new,
-              color: AppColors.textPrimary, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
+        leading: widget.showBackButton 
+            ? IconButton(
+                icon: Icon(Icons.arrow_back_ios_new,
+                    color: AppColors.textPrimary, size: 20),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: Text(
           'Add Photo',
           style: GoogleFonts.outfit(

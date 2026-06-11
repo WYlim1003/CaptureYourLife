@@ -18,5 +18,5 @@ class GeminiConfig {
 
   static bool get isConfigured => apiKey.isNotEmpty;
 
-  static const String imageModel = 'gemini-2.0-flash-exp';
+  static const String imageModel = 'gemini-1.5-flash';
 }
