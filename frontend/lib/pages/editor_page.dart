@@ -1,14 +1,11 @@
-import 'package:capture_your_life/providers/auth_provider.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../config/app_colors.dart';
-import '../components/image_preview.dart';
-import '../components/style_selector.dart';
-import '../components/primary_button.dart';
 import '../components/loading_spinner.dart';
 import '../providers/generation_provider.dart';
-import '../services/api_service.dart';
-
+import '../providers/image_provider.dart';
 
 class EditorPage extends ConsumerStatefulWidget {
   final String imagePath;
@@ -24,31 +21,11 @@ class EditorPage extends ConsumerStatefulWidget {
 
 class _EditorPageState extends ConsumerState<EditorPage> {
   late String selectedTab;
-  String? uploadedImageId;
 
   @override
   void initState() {
     super.initState();
     selectedTab = 'sticker';
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _uploadImage();
-    });
-  }
-
-  Future<void> _uploadImage() async {
-    try {
-      final apiService = ref.read(apiServiceProvider);
-      final result = await apiService.uploadImage(widget.imagePath);
-      if (!mounted) return; // Safer check
-      setState(() {
-        uploadedImageId = result['image_id'];
-      });
-    } catch (e) {
-      if (!context.mounted) return; // Fixed BuildContext async gap warning
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Upload failed: $e')),
-      );
-    }
   }
 
   @override
@@ -59,195 +36,162 @@ class _EditorPageState extends ConsumerState<EditorPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        elevation: 0,
         backgroundColor: Colors.transparent,
-        title: const Text(
-          'Generate',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
+        title: Text(
+          'AI Studio',
+          style: GoogleFonts.outfit(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                ImagePreview(
-                  imagePath: widget.imagePath,
-                  title: 'Your Image',
-                ),
-                const SizedBox(height: 24),
-                _TabSelector(
-                  selectedTab: selectedTab,
-                  onTabChanged: (tab) {
-                    setState(() => selectedTab = tab);
-                    ref.read(selectedStyleProvider.notifier).state = 'anime';
-                  },
-                ),
-                const SizedBox(height: 24),
-                if (selectedTab == 'avatar')
-                  StyleSelector(
-                    styles: const [
-                      'anime',
-                      'comic',
-                      'hand_drawn',
-                      'watercolor',
-                      'cyberpunk'
-                    ],
-                    selectedStyle: selectedStyle,
-                    onStyleSelected: (style) {
-                      ref.read(selectedStyleProvider.notifier).state = style;
-                    },
-                  ),
-                const SizedBox(height: 24),
-                generationState.when(
-                  data: (data) {
-                    if (data.isEmpty) {
-                      return PrimaryButton(
-                        label: selectedTab == 'sticker'
-                            ? 'Generate Sticker'
-                            : 'Generate Avatar',
-                        // FIXED: The argument type error is because PrimaryButton expects a non-null VoidCallback.
-                        onPressed: uploadedImageId != null
-                            ? () async {
-                                if (selectedTab == 'sticker') {
-                                  ref
-                                      .read(generationNotifierProvider.notifier)
-                                      .generateSticker(uploadedImageId!);
-                                } else {
-                                  ref
-                                      .read(generationNotifierProvider.notifier)
-                                      .generateAvatar(
-                                          uploadedImageId!, selectedStyle);
-                                }
-                                
-                                // FIXED: BuildContext across async gaps warning
-                                await Future.delayed(const Duration(seconds: 2));
-                                if (!context.mounted) return; 
-
-                                Navigator.pushNamed(
-                                  context,
-                                  '/preview',
-                                  arguments: generationState,
-                                );
-                              }
-                            : () {}, // Replaced 'null' with an empty function '() {}'
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                  loading: () => const LoadingSpinner(
-                    message: 'Generating your creation...',
-                  ),
-                  error: (error, stack) => Column(
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: AppColors.errorColor,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Error: $error',
-                        style: const TextStyle(color: AppColors.errorColor),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      PrimaryButton(
-                        label: 'Retry',
-                        onPressed: () {
-                          ref.read(generationNotifierProvider.notifier).reset();
-                        },
-                      ),
-                    ],
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image preview
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 260,
+                  child: Image.file(
+                    File(widget.imagePath),
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TabSelector extends StatelessWidget {
-  final String selectedTab;
-  final Function(String) onTabChanged;
-
-  // FIXED: Removed "super.key" to resolve the "value for optional parameter 'key' isn't ever given" warning.
-  const _TabSelector({
-    required this.selectedTab,
-    required this.onTabChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _TabButton(
-          label: 'Sticker',
-          isSelected: selectedTab == 'sticker',
-          onPressed: () => onTabChanged('sticker'),
-        ),
-        const SizedBox(width: 12),
-        _TabButton(
-          label: 'Avatar',
-          isSelected: selectedTab == 'avatar',
-          onPressed: () => onTabChanged('avatar'),
-        ),
-      ],
-    );
-  }
-}
-
-class _TabButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onPressed;
-
-  // FIXED: Removed "super.key" here as well.
-  const _TabButton({
-    required this.label,
-    required this.isSelected,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: isSelected
-                    ? AppColors.primaryColor
-                    : Colors.transparent,
-                width: 2,
               ),
-            ),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isSelected
-                  ? AppColors.primaryColor
-                  : AppColors.textSecondary,
-            ),
+              const SizedBox(height: 24),
+
+              // Coming soon banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryColor.withOpacity(0.15),
+                      AppColors.secondaryColor.withOpacity(0.15),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: AppColors.primaryColor.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_awesome,
+                        color: AppColors.primaryColor, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'AI Generation — Coming Soon 🚀',
+                            style: GoogleFonts.outfit(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            'Stickers, avatars, and styles will be available in the next update.',
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Tab row (disabled)
+              Row(
+                children: ['Sticker', 'Avatar'].map((tab) {
+                  final isSelected = tab.toLowerCase() == selectedTab;
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(
+                          () => selectedTab = tab.toLowerCase()),
+                      child: Container(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: isSelected
+                                  ? AppColors.primaryColor
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          tab,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.outfit(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: isSelected
+                                ? AppColors.primaryColor
+                                : AppColors.textTertiary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 24),
+
+              // Disabled generate button
+              generationState.when(
+                data: (data) => SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    onPressed: null, // Disabled — AI not yet integrated
+                    icon: const Icon(Icons.auto_awesome, size: 18),
+                    label: Text(
+                      selectedTab == 'sticker'
+                          ? 'Generate Sticker (Coming Soon)'
+                          : 'Generate Avatar (Coming Soon)',
+                      style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.w600),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor.withOpacity(0.3),
+                      disabledBackgroundColor:
+                          AppColors.primaryColor.withOpacity(0.3),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+                loading: () => const LoadingSpinner(
+                    message: 'Generating your creation...'),
+                error: (error, _) => Center(
+                  child: Text(
+                    'Error: $error',
+                    style: const TextStyle(color: AppColors.errorColor),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

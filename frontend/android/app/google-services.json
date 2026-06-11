@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "786561093977",
+    "project_id": "captureyourlife-4f28d",
+    "storage_bucket": "captureyourlife-4f28d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786561093977:android:e7d623ac48186c5a717c48",
+        "android_client_info": {
+          "package_name": "com.wanyee.captureyourlife"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKFsSnhw3l3mlkGbCMgltLAs0vz1MnipM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
