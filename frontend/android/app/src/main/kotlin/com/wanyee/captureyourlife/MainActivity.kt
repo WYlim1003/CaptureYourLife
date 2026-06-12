@@ -1,4 +1,4 @@
-package com.example.capture_your_life
+package com.wanyee.captureyourlife
 
 import io.flutter.embedding.android.FlutterActivity
 
