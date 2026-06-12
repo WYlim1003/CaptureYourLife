@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../components/animated_logo.dart';
 import '../config/app_colors.dart';
 import '../providers/firebase_auth_provider.dart';
 import '../providers/theme_provider.dart';
@@ -27,7 +28,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
+      duration: const Duration(milliseconds: 2200),
     );
     _scale = Tween<double>(begin: 0.7, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
@@ -43,7 +44,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
   }
 
   Future<void> _navigateAfterSplash() async {
-    await Future.delayed(const Duration(milliseconds: 2200));
+    await Future.delayed(const Duration(milliseconds: 4000));
     if (!mounted) return;
 
     final authAsync = ref.read(authStateProvider);
@@ -101,28 +102,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(28),
-                  child: Image.asset(
-                    'assets/images/Logo.png',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradient,
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 56,
-                      ),
-                    ),
-                  ),
-                ),
+                const AnimatedLogo(width: 280, height: 160),
                 const SizedBox(height: 28),
                 Text(
                   'CaptureYourLife',

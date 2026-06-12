@@ -90,7 +90,7 @@ class HomePage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Camera CTA card
-                  _CameraCTA(onTap: () => Navigator.pushNamed(context, '/camera')),
+                  _CameraCTA(onTap: () => Navigator.pushNamed(context, '/camera', arguments: {'autoOpenCamera': true})),
                   const SizedBox(height: 28),
 
                   // Quick actions
@@ -110,7 +110,7 @@ class HomePage extends ConsumerWidget {
                           icon: Icons.camera_alt_outlined,
                           label: 'Take Photo',
                           color: AppColors.primaryColor,
-                          onTap: () => Navigator.pushNamed(context, '/camera'),
+                          onTap: () => Navigator.pushNamed(context, '/camera', arguments: {'autoOpenCamera': true}),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -128,7 +128,7 @@ class HomePage extends ConsumerWidget {
                           icon: Icons.auto_awesome,
                           label: 'AI Studio',
                           color: const Color(0xFF43E97B),
-                          onTap: () => Navigator.pushNamed(context, '/camera'),
+                          onTap: () => Navigator.pushNamed(context, '/camera', arguments: {'autoOpenCamera': true}),
                         ),
                       ),
                     ],
@@ -174,7 +174,7 @@ class HomePage extends ConsumerWidget {
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                     child: _EmptyPhotosCard(
-                      onTap: () => Navigator.pushNamed(context, '/camera'),
+                      onTap: () => Navigator.pushNamed(context, '/camera', arguments: {'autoOpenCamera': true}),
                     ),
                   );
                 }

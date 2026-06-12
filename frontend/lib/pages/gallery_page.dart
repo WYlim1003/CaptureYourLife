@@ -51,7 +51,7 @@ class GalleryPage extends ConsumerWidget {
           data: (photos) {
             if (photos.isEmpty) {
               return _EmptyGallery(
-                  onAdd: () => Navigator.pushNamed(context, '/camera'));
+                  onAdd: () => Navigator.pushNamed(context, '/camera', arguments: {'autoOpenCamera': true}));
             }
             return GridView.builder(
               padding: const EdgeInsets.all(16),
@@ -86,7 +86,7 @@ class GalleryPage extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/camera'),
+        onPressed: () => Navigator.pushNamed(context, '/camera', arguments: {'autoOpenCamera': true}),
         backgroundColor: AppColors.primaryColor,
         child: const Icon(Icons.add_a_photo, color: Colors.white),
       ),

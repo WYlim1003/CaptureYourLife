@@ -43,7 +43,9 @@ class MyApp extends ConsumerWidget {
           case '/home':
             return _fadeRoute(const MainPage());
           case '/camera':
-            return _fadeRoute(const CameraPage());
+            final args = settings.arguments;
+            final autoOpen = args is Map && args['autoOpenCamera'] == true;
+            return _fadeRoute(CameraPage(autoOpenCamera: autoOpen));
           case '/gallery':
             return _fadeRoute(const GalleryPage());
           case '/login':

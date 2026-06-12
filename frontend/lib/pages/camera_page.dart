@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,10 +9,12 @@ import '../utils/image_from_path.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   final bool showBackButton;
-  
+  final bool autoOpenCamera;
+
   const CameraPage({
     super.key,
     this.showBackButton = true,
+    this.autoOpenCamera = false,
   });
 
   @override
@@ -33,6 +36,26 @@ class _CameraPageState extends ConsumerState<CameraPage>
     );
     _scaleAnim = CurvedAnimation(parent: _animController, curve: Curves.easeOutBack);
     _animController.forward();
+
+    if (widget.autoOpenCamera) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _openCamera());
+    }
+  }
+
+  Future<void> _openCamera() async {
+    if (!mounted) return;
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Camera access on web uses your browser. '
+            'Allow camera permission when prompted, or use Gallery.',
+          ),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
+    await ref.read(imagePickerNotifierProvider.notifier).pickFromCamera();
   }
 
   @override
@@ -136,30 +159,33 @@ class _CameraPageState extends ConsumerState<CameraPage>
               ],
             ),
           ),
-          error: (error, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline,
-                      color: AppColors.errorColor, size: 48),
-                  const SizedBox(height: 12),
-                  Text(
-                    error.toString(),
-                    style: TextStyle(color: AppColors.textSecondary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () =>
-                        ref.read(imagePickerNotifierProvider.notifier).reset(),
-                    child: const Text('Try Again'),
-                  ),
-                ],
+          error: (error, _) {
+            final message = error.toString().replaceFirst('Exception: ', '');
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline,
+                        color: AppColors.errorColor, size: 48),
+                    const SizedBox(height: 12),
+                    Text(
+                      message,
+                      style: TextStyle(color: AppColors.textSecondary),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    OutlinedButton(
+                      onPressed: () =>
+                          ref.read(imagePickerNotifierProvider.notifier).reset(),
+                      child: const Text('Try Again'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

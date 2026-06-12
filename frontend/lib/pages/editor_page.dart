@@ -57,7 +57,17 @@ class _EditorPageState extends ConsumerState<EditorPage> {
 
     if (!mounted) return;
     final state = ref.read(generationNotifierProvider);
-    if (state.hasError) return;
+    if (state.hasError) {
+      final error = state.error;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+          backgroundColor: AppColors.errorColor,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      return;
+    }
     final data = state.valueOrNull;
     if (data == null || data['status'] != 'success') return;
 

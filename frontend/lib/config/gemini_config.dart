@@ -1,22 +1,8 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../ai/ai_config.dart';
 
-/// Gemini API key — set in `frontend/.env`:
-/// `GEMINI_API_KEY=your_key_here`
-///
-/// Or pass at run time: `flutter run --dart-define=GEMINI_API_KEY=your_key`
+/// Backwards-compatible alias for [AiConfig].
 class GeminiConfig {
-  static String get apiKey {
-    final fromDotEnv = dotenv.env['GEMINI_API_KEY']?.trim();
-    if (fromDotEnv != null && fromDotEnv.isNotEmpty) return fromDotEnv;
-
-    const fromDefine = String.fromEnvironment(
-      'GEMINI_API_KEY',
-      defaultValue: '',
-    );
-    return fromDefine;
-  }
-
-  static bool get isConfigured => apiKey.isNotEmpty;
-
-  static const String imageModel = 'gemini-1.5-flash';
+  static String get apiKey => AiConfig.apiKey;
+  static bool get isConfigured => AiConfig.isConfigured;
+  static String get imageModel => AiConfig.imageModel;
 }

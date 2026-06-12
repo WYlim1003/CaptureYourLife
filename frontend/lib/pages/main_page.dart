@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/app_colors.dart';
+import '../providers/image_provider.dart';
 import 'home_page.dart';
 import 'camera_page.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = const [
     HomePage(),
+    CameraPage(showBackButton: false, autoOpenCamera: true),
     CameraPage(showBackButton: false),
-    CameraPage(showBackButton: false), 
   ];
 
   @override
@@ -37,9 +39,12 @@ class _MainPageState extends State<MainPage> {
           unselectedItemColor: AppColors.textSecondary,
           type: BottomNavigationBarType.fixed,
           onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
+            setState(() => _currentIndex = index);
+            if (index == 1) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ref.read(imagePickerNotifierProvider.notifier).pickFromCamera();
+              });
+            }
           },
           items: const [
             BottomNavigationBarItem(
